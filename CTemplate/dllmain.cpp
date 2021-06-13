@@ -9,6 +9,7 @@
 #include <Common.h>
 #include <hooker.h>
 #include <memedit.h>
+#include <iostream>
 
 // BE AWARE ===v
 // in order to fix the detours.lib link error you need to replace
@@ -17,10 +18,43 @@
 
 /// ================ \\\
 
+typedef LRESULT(CALLBACK* _CWvsApp__WindowProc_t)(HWND hWndInsertAfter, UINT msg, WPARAM wParam, LPARAM lParam);
+_CWvsApp__WindowProc_t o_CWvsApp__WindowProc;
+
+LRESULT CALLBACK WindowProc_Hook(
+	HWND hWnd,
+	UINT uMsg,
+	WPARAM wParam,
+	LPARAM lParam
+)
+{
+	//Log("WindowProc msg: %d", uMsg);
+	//std::cout << uMsg << std::endl;
+	std::cout << o_CWvsApp__WindowProc << std::endl;
+
+	//call original function
+	return o_CWvsApp__WindowProc(hWnd, uMsg, wParam, lParam);
+}
+
 // executed after the client is unpacked
 VOID MainFunc()
 {
-	Log(__FUNCTION__);
+	AllocConsole();
+	freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
+	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+	SetConsoleTitleA("KYLE SWORDIE HACK v221.1");
+
+
+
+	//HWND window = FindWindowA("MapleStoryClass", nullptr);
+	//o_CWvsApp__WindowProc = WNDPROC(SetWindowLongPtrA(window, GWLP_WNDPROC, LONG_PTR(WindowProc_Hook)));
+
+	while (!GetAsyncKeyState(VK_END))
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+	fclose((FILE*)stdin);
+	fclose((FILE*)stdout);
+	FreeConsole();
 
 	return;
 
@@ -51,23 +85,6 @@ VOID MainFunc()
 	PatchRetZero(0x0); // function start address to return zero at
 }
 
-// prolly don't edit this region if youre a noob
-#pragma region EntryThread
-
-// main thread
-VOID MainProc()
-{
-	Log(__FUNCTION__);
-
-	Common::CreateInstance
-	(
-		TRUE,			// true if you want to hook windows libraries (besides mutex) set this to false if you already edited your IP into the client (eg v83 localhosts)
-		MainFunc,		// function to be executed after client is unpacked
-		"127.0.0.1",	// IP to connect to (your server IP)
-		"127.0.0.1"		// IP to redirect from (nexon IP)
-	);
-}
-
 // dll entry point
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -77,8 +94,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	{
 		Log("DLL_PROCESS_ATTACH");
 
-		DisableThreadLibraryCalls(hModule);
-		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&MainProc, NULL, 0, 0);
+		if (HANDLE thread = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)&MainFunc, NULL, NULL, NULL))
+			CloseHandle(thread);
 		break;
 	}
 	case DLL_PROCESS_DETACH:
