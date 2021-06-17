@@ -11,8 +11,11 @@
 #include <memedit.h>
 #include <iostream>
 #include <memory>
+#include <shellapi.h>
+
 #include "Utilities.h"
 #include "HacksContainer.h"
+#include "PipeHandler.h"
 
 // BE AWARE ===v
 // in order to fix the detours.lib link error you need to replace
@@ -20,6 +23,9 @@
 // with $(SolutionDir)Common;$(LibraryPath)
 
 /// ================ \\\
+
+//will be initialized once the dll is injected
+std::string dllPath;
 
 typedef LRESULT(CALLBACK* _CWvsApp__WindowProc_t)(HWND hWndInsertAfter, UINT msg, WPARAM wParam, LPARAM lParam);
 _CWvsApp__WindowProc_t o_CWvsApp__WindowProc;
@@ -47,23 +53,26 @@ VOID MainFunc()
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 	SetConsoleTitleA("KYLE SWORDIE HACK v221.1");
 
-	HacksContainer::get().init();
+	//HacksContainer::get().init();
 
-	HacksContainer::get().fullMapAttackV1->enable();
-	HacksContainer::get().genericND->enable();
-	HacksContainer::get().flashJumpND->enable();
-	HacksContainer::get().unlimitedAttack->enable();
+	//HacksContainer::get().fullMapAttackV1->enable();
+	//HacksContainer::get().genericND->enable();
+	//HacksContainer::get().flashJumpND->enable();
+	//HacksContainer::get().unlimitedAttack->enable();
 
 	//HWND window = FindWindowA("MapleStoryClass", nullptr);
 	//o_CWvsApp__WindowProc = WNDPROC(SetWindowLongPtrA(window, GWLP_WNDPROC, LONG_PTR(WindowProc_Hook)));
 
-	while (!GetAsyncKeyState(VK_END))
+	//create the process and pipe
+	PipeHandler::get().initLink(dllPath);
+
+	//figure this out later lmao
+	while (true)
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 	//disable all hacks
 	for (std::shared_ptr<Hack> hack : HacksContainer::get().hacks)
 		hack->disable();
-
 
 	fclose((FILE*)stdin); 
 	fclose((FILE*)stdout);
@@ -101,6 +110,9 @@ VOID MainFunc()
 // dll entry point
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
+	//quickly snatch dat hModule 2 get path
+	dllPath = Utilities::getDllPath(hModule);
+
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
