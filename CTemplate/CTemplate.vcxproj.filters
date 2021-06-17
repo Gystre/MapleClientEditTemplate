@@ -16,6 +16,12 @@
     <Filter Include="Proxy">
       <UniqueIdentifier>{ee34f9f8-3892-447c-8cee-869a00197983}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features">
+      <UniqueIdentifier>{dac88a9d-fc09-47fe-8814-b8ef4fa88309}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Hacks">
+      <UniqueIdentifier>{9de4205c-43b4-4806-9261-b3403f15ea74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -33,6 +39,36 @@
     <ClInclude Include="ExampleHooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HacksContainer.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hack.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="FullMapAttackV1.h">
+      <Filter>Features\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericND.h">
+      <Filter>Features\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashJumpND.h">
+      <Filter>Features\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="JumpDownAnywhere.h">
+      <Filter>Features\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="UnlimitedAttack.h">
+      <Filter>Features\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="NoCatchBreath.h">
+      <Filter>Features\Hacks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -49,6 +85,15 @@
     </ClCompile>
     <ClCompile Include="ExampleHooks.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HacksContainer.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="Hack.cpp">
+      <Filter>Features</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

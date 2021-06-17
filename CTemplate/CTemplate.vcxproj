@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -171,15 +171,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FlashJumpND.h" />
+    <ClInclude Include="FullMapAttackV1.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="ExampleHooks.h" />
+    <ClInclude Include="GenericND.h" />
+    <ClInclude Include="Hack.h" />
+    <ClInclude Include="HacksContainer.h" />
     <ClInclude Include="ijl15.h" />
+    <ClInclude Include="JumpDownAnywhere.h" />
     <ClInclude Include="MapleAPI.h" />
+    <ClInclude Include="NoCatchBreath.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="UnlimitedAttack.h" />
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExampleHooks.cpp" />
+    <ClCompile Include="Hack.cpp" />
+    <ClCompile Include="HacksContainer.cpp" />
     <ClCompile Include="ijl15.cpp" />
     <ClCompile Include="MapleAPI.cpp" />
     <ClCompile Include="pch.cpp">
@@ -188,6 +200,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

@@ -10,6 +10,9 @@
 #include <hooker.h>
 #include <memedit.h>
 #include <iostream>
+#include <memory>
+#include "Utilities.h"
+#include "HacksContainer.h"
 
 // BE AWARE ===v
 // in order to fix the detours.lib link error you need to replace
@@ -44,7 +47,12 @@ VOID MainFunc()
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 	SetConsoleTitleA("KYLE SWORDIE HACK v221.1");
 
+	HacksContainer::get().init();
 
+	HacksContainer::get().fullMapAttackV1->enable();
+	HacksContainer::get().genericND->enable();
+	HacksContainer::get().flashJumpND->enable();
+	HacksContainer::get().unlimitedAttack->enable();
 
 	//HWND window = FindWindowA("MapleStoryClass", nullptr);
 	//o_CWvsApp__WindowProc = WNDPROC(SetWindowLongPtrA(window, GWLP_WNDPROC, LONG_PTR(WindowProc_Hook)));
@@ -52,7 +60,12 @@ VOID MainFunc()
 	while (!GetAsyncKeyState(VK_END))
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-	fclose((FILE*)stdin);
+	//disable all hacks
+	for (std::shared_ptr<Hack> hack : HacksContainer::get().hacks)
+		hack->disable();
+
+
+	fclose((FILE*)stdin); 
 	fclose((FILE*)stdout);
 	FreeConsole();
 
