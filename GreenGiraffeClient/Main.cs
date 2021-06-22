@@ -22,7 +22,7 @@ namespace GreenGiraffeClient
             NamedPipeClientStream pipe = new NamedPipeClientStream(".", "GGClientPipe", PipeDirection.InOut);
             pipe.Connect();
 
-            //once connected, read in the passed data
+            //once connected, read in the alive message to open the form
             using (StreamReader rdr = new StreamReader(pipe, Encoding.UTF8))
             {
                 rdr.ReadToEnd();

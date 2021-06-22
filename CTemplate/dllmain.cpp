@@ -27,22 +27,15 @@
 //will be initialized once the dll is injected
 std::string dllPath;
 
-typedef LRESULT(CALLBACK* _CWvsApp__WindowProc_t)(HWND hWndInsertAfter, UINT msg, WPARAM wParam, LPARAM lParam);
-_CWvsApp__WindowProc_t o_CWvsApp__WindowProc;
+//void __thiscall CUserLocal::FallDown(int this, int bEnforcedPrepareJump)
+typedef void(__fastcall* _CUserLocal__FallDown_t)(PVOID pThis, PVOID edx, int bEnforcedPrepareJump);
+_CUserLocal__FallDown_t o_CUserLocal__FallDown;
 
-LRESULT CALLBACK WindowProc_Hook(
-	HWND hWnd,
-	UINT uMsg,
-	WPARAM wParam,
-	LPARAM lParam
-)
+void __fastcall CUserLocal__FallDown_Hook(PVOID pThis, PVOID edx, int bEnforcedPrepareJump)
 {
-	//Log("WindowProc msg: %d", uMsg);
-	//std::cout << uMsg << std::endl;
-	std::cout << o_CWvsApp__WindowProc << std::endl;
+	std::cout << "cuserlocal: 0x" << pThis << std::endl;
 
-	//call original function
-	return o_CWvsApp__WindowProc(hWnd, uMsg, wParam, lParam);
+	o_CUserLocal__FallDown(pThis, NULL, bEnforcedPrepareJump);
 }
 
 // executed after the client is unpacked
@@ -51,7 +44,14 @@ VOID MainFunc()
 	AllocConsole();
 	freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-	SetConsoleTitleA("KYLE SWORDIE HACK v221.1");
+	SetConsoleTitleA("KYLE SWORDIE HACK v223.3");
+
+	//INITMAPLEHOOK(
+	//	o_CUserLocal__FallDown,
+	//	_CUserLocal__FallDown_t,
+	//	CUserLocal__FallDown_Hook,
+	//	0x02BD1BC0
+	//)
 
 	//HacksContainer::get().init();
 
@@ -60,11 +60,20 @@ VOID MainFunc()
 	//HacksContainer::get().flashJumpND->enable();
 	//HacksContainer::get().unlimitedAttack->enable();
 
-	//HWND window = FindWindowA("MapleStoryClass", nullptr);
-	//o_CWvsApp__WindowProc = WNDPROC(SetWindowLongPtrA(window, GWLP_WNDPROC, LONG_PTR(WindowProc_Hook)));
-
 	//create the process and pipe
 	PipeHandler::get().initLink(dllPath);
+
+	//doesn't crash but also doesn't work :/
+	//auto base = (uintptr_t)GetModuleHandle(0);
+	//auto size = Utilities::getModuleSize(base);
+	//uintptr_t loc = Utilities::findPattern(base, size, (char*)"7E ?? 83 ?? ?? 7D ?? 8B ?? ?? 2B C2 3D 6A FF FF FF 7E ?? 3D 96 00 00 00 7D ?? 8B ?? ?? 3B ?? ?? 7C ??");
+	//std::cout << loc << std::endl;	
+
+	//some sort of packet encryption function from blackcipher
+	//auto base = (uintptr_t)GetModuleHandle(0);
+	//auto size = Utilities::getModuleSize(base);
+	//uintptr_t loc = Utilities::findPattern(base, size, (char*)"8b 47 08 3d 00 ff");
+	//std::cout << loc << std::endl;
 
 	//figure this out later lmao
 	while (true)

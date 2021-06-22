@@ -1,50 +1,69 @@
 #include "pch.h"
 #include "Utilities.h"
+#include "ntdll.h"
 
 namespace Utilities {
-	std::uint8_t* patternScan(void* module, const char* signature) {
-		static auto pattern_to_byte = [](const char* pattern) {
-			auto bytes = std::vector<int>{};
-			auto start = const_cast<char*>(pattern);
-			auto end = const_cast<char*>(pattern) + strlen(pattern);
+	bool bCompare(const char* pData, const char* bMask, const char* szMask)
+	{
+		for (; *szMask; ++szMask, ++pData, ++bMask)
+			if (*szMask == 'x' && *pData != *bMask)
+				return false;
+		return (*szMask) == NULL;
+	}
 
-			for (auto current = start; current < end; ++current) {
-				if (*current == '?') {
-					++current;
-					if (*current == '?')
-						++current;
-					bytes.push_back(-1);
-				}
-				else {
-					bytes.push_back(strtoul(current, &current, 16));
-				}
-			}
-			return bytes;
-		};
-
-		auto dos_headers = (PIMAGE_DOS_HEADER)module;
-		auto nt_headers = (PIMAGE_NT_HEADERS)((std::uint8_t*)module + dos_headers->e_lfanew);
-
-		auto size_of_image = nt_headers->OptionalHeader.SizeOfImage;
-		auto pattern_bytes = pattern_to_byte(signature);
-		auto scan_bytes = reinterpret_cast<std::uint8_t*>(module);
-
-		auto s = pattern_bytes.size();
-		auto d = pattern_bytes.data();
-
-		for (auto i = 0ul; i < size_of_image - s; ++i) {
-			bool found = true;
-			for (auto j = 0ul; j < s; ++j) {
-				if (scan_bytes[i + j] != d[j] && d[j] != -1) {
-					found = false;
-					break;
-				}
-			}
-			if (found) {
-				return &scan_bytes[i];
-			}
+	uintptr_t findPattern(uintptr_t dwAddress, uintptr_t dwLen, const char* bMask, const char* szMask)
+	{
+		if (dwAddress == 0)
+		{
+			//Log( "Start address is null" );
+			return 0;
 		}
-		return nullptr;
+
+		for (uintptr_t i = 0; i < dwLen; i++)
+			if (bCompare((char*)(dwAddress + i), bMask, szMask))
+				return (uintptr_t)(dwAddress + i);
+
+		return 0;
+	}
+
+	uintptr_t findPattern(uintptr_t dwAddress, uintptr_t dwLen, const char* pat)
+	{
+		std::string pattern(pat), bytePattern, byteMask;
+		// AA BB CC DD EE ?? FF GG ? ZZ
+		// do this past each space. strtol will stop at that point.
+		auto loc = 0;
+		while (loc != pattern.npos)
+		{
+			// case for ?? / ?
+			if (*(pattern.c_str() + loc) == '?')
+				bytePattern += '\x00', byteMask += '?';
+			else
+				bytePattern += strtol(pattern.c_str() + loc, 0, 16), byteMask += 'x';
+
+			auto f = pattern.find(' ', loc);
+			loc = f != pattern.npos ? f + 1 : f; //npos or space + 1
+		}
+
+		return findPattern(dwAddress, dwLen, bytePattern.c_str(), byteMask.c_str());
+	}
+
+	uintptr_t getModuleSize(uintptr_t base)
+	{
+		MEMORY_BASIC_INFORMATION region = { 0 };
+		ULONG out_size = 0;
+		auto stat = NtQueryVirtualMemory((HANDLE)-1, (void*)base, MemoryRegionInformation, &region, sizeof(region), &out_size);
+		if (stat != 0)
+		{
+			if (stat == 0xC0000004)
+			{
+				Log("Actual size is %d not %d", out_size, sizeof(region));
+			}
+
+			Log("NTQVM ERROR: %X", stat);
+			return 0;
+		}
+
+		return region.RegionSize;
 	}
 
 	std::string getDllPath(HMODULE hModule) {

@@ -5,7 +5,8 @@
 #include <string>
 
 namespace Utilities {
-	uint8_t* patternScan(void* module, const char* signature);
+	uintptr_t findPattern(uintptr_t dwAddress, uintptr_t dwLen, const char* pat);
+	uintptr_t getModuleSize(uintptr_t base);
 
 	std::string getDllPath(HMODULE hModule);
 
