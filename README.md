@@ -1,5 +1,16 @@
 # MapleClientCollection
 
+Just a small trainer to learn about how maplestory revere engineering works. I want to create something similar to GameKiller's trainer with an external form being created to control the hacks that are used.
+
+## Goals
+- Find cin and cout packet functions
+- disable and enable hacks from the c# client
+- god mode
+- auto login
+- teleport (maybe)
+
+
+## original readme: 
 A (increasingly generic) framework that is intended to be used when crafting new MapleStory client redirectors/edits.  
 This should work pretty much out of the box and all that is required is potential anticheat and crc bypasses. These are version dependant.  
 This solution contains all the Windows library hooks that are required for a MapleStory localhost enabler and is configured to be as noob friendly as possible.  
