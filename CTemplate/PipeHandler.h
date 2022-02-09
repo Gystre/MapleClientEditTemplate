@@ -6,9 +6,9 @@
 
 class PipeHandler : public Singleton<PipeHandler>
 {
+private:
+	DWORD sendMsg(std::string msg);
 public:
-	HANDLE hPipe;
-
 	//opens pipe, creates process, and connects pipe to process
-	void initLink(std::string dllPath);
+	bool initLink(std::string dllPath);
 };

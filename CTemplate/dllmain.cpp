@@ -28,14 +28,33 @@
 std::string dllPath;
 
 //void __thiscall CUserLocal::FallDown(int this, int bEnforcedPrepareJump)
-typedef void(__fastcall* _CUserLocal__FallDown_t)(PVOID pThis, PVOID edx, int bEnforcedPrepareJump);
-_CUserLocal__FallDown_t o_CUserLocal__FallDown;
+//typedef void(__fastcall* _CUserLocal__FallDown_t)(PVOID pThis, PVOID edx, int bEnforcedPrepareJump);
+//_CUserLocal__FallDown_t o_CUserLocal__FallDown;
+//
+//void __fastcall CUserLocal__FallDown_Hook(PVOID pThis, PVOID edx, int bEnforcedPrepareJump)
+//{
+//	std::cout << "cuserlocal: 0x" << pThis << std::endl;
+//
+//	o_CUserLocal__FallDown(pThis, NULL, bEnforcedPrepareJump);
+//}
 
-void __fastcall CUserLocal__FallDown_Hook(PVOID pThis, PVOID edx, int bEnforcedPrepareJump)
-{
-	std::cout << "cuserlocal: 0x" << pThis << std::endl;
+//typedef void(__fastcall* _CField__OnPacket_t)(PVOID pThis, PVOID edx, int nType, void* iPacket);
+//_CField__OnPacket_t o_CField__OnPacket;
+//
+//void __fastcall CField__OnPacketHook(PVOID pThis, PVOID edx, int nType, void* iPacket)
+//{
+//	std::cout << "nType: " << nType << " iPacket: " << iPacket << std::endl;
+//
+//	o_CField__OnPacket(pThis, edx, nType, iPacket);
+//}
 
-	o_CUserLocal__FallDown(pThis, NULL, bEnforcedPrepareJump);
+typedef void(__thiscall* CWvsContext__OnPacket_t)(void* _this, int a2, void* a3);
+CWvsContext__OnPacket_t CWvsContext__OnPacket;
+
+void __fastcall CWvsContext__OnPacket_Hook(void* _this, void* edx, int a2, void* a3) {
+	Log("OnPacket %d", a2);
+
+	CWvsContext__OnPacket(_this, a2, a3);
 }
 
 // executed after the client is unpacked
@@ -61,7 +80,10 @@ VOID MainFunc()
 	//HacksContainer::get().unlimitedAttack->enable();
 
 	//create the process and pipe
-	PipeHandler::get().initLink(dllPath);
+	if (!PipeHandler::get().initLink(dllPath))
+	{
+		std::cout << "somethin bad happened with the pipe :/" << std::endl;
+	}
 
 	//doesn't crash but also doesn't work :/
 	//auto base = (uintptr_t)GetModuleHandle(0);
@@ -135,7 +157,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	case DLL_PROCESS_DETACH:
 	{
 		Log("DLL_PROCESS_DETACH");
+
 		Common::GetInstance()->~Common();
+
 		break;
 	}
 	}

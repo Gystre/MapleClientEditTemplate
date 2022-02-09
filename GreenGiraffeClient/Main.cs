@@ -14,19 +14,16 @@ namespace GreenGiraffeClient
 {
     public partial class Main : Form
     {
+        PipeHandler pipeHandler;
+
         public Main()
         {
             InitializeComponent();
 
-            //connect the pipe
-            NamedPipeClientStream pipe = new NamedPipeClientStream(".", "GGClientPipe", PipeDirection.InOut);
-            pipe.Connect();
+            //start listening for events
+            pipeHandler = new PipeHandler("GGClientPipeOUT", "GGClientPipeIN");
+            pipeHandler.listen();
 
-            //once connected, read in the alive message to open the form
-            using (StreamReader rdr = new StreamReader(pipe, Encoding.UTF8))
-            {
-                rdr.ReadToEnd();
-            }
         }
     }
 }
